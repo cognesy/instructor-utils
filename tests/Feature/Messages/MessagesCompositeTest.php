@@ -2,7 +2,6 @@
 
 use Cognesy\Utils\Messages\Message;
 use Cognesy\Utils\Messages\Messages;
-use Cognesy\Utils\Messages\Enums\MessageRole;
 
 test('can merge roles with composite messages', function () {
     // Create a composite message

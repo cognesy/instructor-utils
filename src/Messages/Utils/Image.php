@@ -1,6 +1,6 @@
 <?php
 
-namespace Cognesy\Utils\Image;
+namespace Cognesy\Utils\Messages\Utils;
 
 use Cognesy\Utils\Messages\Contracts\CanProvideMessages;
 use Cognesy\Utils\Messages\Message;
@@ -10,7 +10,8 @@ use Exception;
 /**
  * The Image class.
  *
- * Represent an image in LLM calls. Provides convenience methods to extract data from the image.
+ * Represent an image in LLM calls.
+ * Provides convenience methods to extract data from the image.
  */
 class Image implements CanProvideMessages
 {
@@ -71,7 +72,7 @@ class Image implements CanProvideMessages
     /**
      * Get the image as Messages object.
      *
-     * @return Messages
+     * @return \Cognesy\Utils\Messages\Messages
      */
     public function toMessages(): Messages {
         return Messages::fromMessages([$this->toMessage()]);
@@ -80,7 +81,7 @@ class Image implements CanProvideMessages
     /**
      * Get the image as a Message object.
      *
-     * @return Message
+     * @return \Cognesy\Utils\Messages\Message
      */
     public function toMessage(): Message {
         return Message::fromArray($this->toArray());

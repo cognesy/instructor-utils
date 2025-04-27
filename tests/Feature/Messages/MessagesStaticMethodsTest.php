@@ -2,7 +2,6 @@
 
 use Cognesy\Utils\Messages\Message;
 use Cognesy\Utils\Messages\Messages;
-use Cognesy\Utils\Messages\Enums\MessageRole;
 
 // HandlesCreation static methods
 test('static fromString creates Messages with correct role and content', function () {

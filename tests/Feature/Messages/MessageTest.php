@@ -1,7 +1,7 @@
 <?php
 
-use Cognesy\Utils\Messages\Message;
 use Cognesy\Utils\Messages\Enums\MessageRole;
+use Cognesy\Utils\Messages\Message;
 use Cognesy\Utils\Tests\Fixtures\MockImage;
 use Cognesy\Utils\Tests\Fixtures\MockMessageProvider;
 

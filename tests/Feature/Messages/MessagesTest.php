@@ -2,7 +2,6 @@
 
 use Cognesy\Utils\Messages\Message;
 use Cognesy\Utils\Messages\Messages;
-use Cognesy\Utils\Messages\Enums\MessageRole;
 
 // Test HandlesCreation trait
 test('can create Messages from string', function () {

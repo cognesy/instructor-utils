@@ -1,6 +1,6 @@
 <?php
 
-namespace Cognesy\Utils\Messages\Utils;
+namespace Cognesy\Utils;
 
 use BackedEnum;
 use Closure;
