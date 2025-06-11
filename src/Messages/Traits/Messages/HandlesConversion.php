@@ -21,8 +21,8 @@ trait HandlesConversion
         $merged = new Messages();
         $content = [];
         foreach ($messages as $message) {
-            if ($role !== $message['role'] || \Cognesy\Utils\Messages\Message::becomesComposite($message)) {
-                $merged->appendMessage(new \Cognesy\Utils\Messages\Message(
+            if ($role !== $message['role'] || Message::becomesComposite($message)) {
+                $merged->appendMessage(new Message(
                     role: $role,
                     content: implode("\n\n", array_filter($content)),
                 ));
@@ -61,7 +61,7 @@ trait HandlesConversion
                 !is_null($renderer) => $renderer($message),
                 default => match(true) {
                     Message::becomesComposite($message) => throw new RuntimeException('Array contains composite messages, cannot be converted to string.'),
-                    default => $message['content'] . $separator,
+                    default => Message::fromAny($message)->toString() . $separator,
                 }
             };
             $result .= $rendered;

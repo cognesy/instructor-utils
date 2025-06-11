@@ -6,7 +6,6 @@ use Cognesy\Utils\Messages\Traits\Message\HandlesAccess;
 use Cognesy\Utils\Messages\Traits\Message\HandlesCreation;
 use Cognesy\Utils\Messages\Traits\Message\HandlesMutation;
 use Cognesy\Utils\Messages\Traits\Message\HandlesTransformation;
-use Cognesy\Utils\Uuid;
 
 /**
  * Represents a message entity with role, content, and metadata properties.
@@ -36,10 +35,9 @@ class Message {
 
     public const DEFAULT_ROLE = 'user';
 
-    protected string $id;
     protected string $role;
     protected string $name;
-    protected string|array $content;
+    protected Content $content;
     protected array $metadata = [];
 
     /**
@@ -48,18 +46,35 @@ class Message {
      */
     public function __construct(
         string|MessageRole $role = '',
-        string|array|null $content = '',
+        string|array|Content|null $content = null,
         string $name = '',
         array $metadata = [],
     ) {
-        $this->id = Uuid::uuid4();
         $this->role = match(true) {
             $role instanceof MessageRole => $role->value,
             ($role === '') => self::DEFAULT_ROLE,
             default => $role,
         };
         $this->name = $name;
-        $this->content = $content ?? '';
+        $this->content = Content::fromAny($content);
         $this->metadata = $metadata;
+    }
+
+    /**
+     * Checks if given array is OpenAI formatted message
+     * @param array $message
+     * @return bool
+     */
+    public static function isMessage(array $message): bool {
+        return isset($message['role']) && isset($message['content']);
+    }
+
+    /**
+     * Checks if given array is OpenAI array of formatted messages
+     * @param array $messages
+     * @return bool
+     */
+    public static function isMessages(array $messages): bool {
+        return isset($messages[0]['role']) && isset($messages[0]['content']);
     }
 }
