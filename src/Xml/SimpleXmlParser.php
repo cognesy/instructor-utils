@@ -91,7 +91,7 @@ class SimpleXmlParser
 
     /**
      * Convert the XML string to array
-     * @return array
+     * @return array<string, mixed>
      */
     public function toArray(): array {
         if ($this->parsedData === null) {
@@ -102,7 +102,7 @@ class SimpleXmlParser
 
     /**
      * Convert the XML string to array
-     * @return string
+     * @return array<string, mixed>
      */
     private function convertXmlToArray(): array {
         if ($this->xmlString === '') {
@@ -110,9 +110,9 @@ class SimpleXmlParser
         }
         
         libxml_use_internal_errors(true);
-        $xmlElement = new SimpleXMLElement($this->xmlString, LIBXML_NOCDATA);
-        
-        if ($xmlElement === false) {
+        try {
+            $xmlElement = new SimpleXMLElement($this->xmlString, LIBXML_NOCDATA);
+        } catch (\Exception $e) {
             $errors = libxml_get_errors();
             $errorMessages = array_map(fn($error) => trim($error->message), $errors);
             libxml_clear_errors();
@@ -123,7 +123,8 @@ class SimpleXmlParser
         if ($this->includeRoot) {
             return [$xmlElement->getName() => $array];
         }
-        return $array;
+        // If xmlToArray returned a string, wrap it in an array
+        return is_string($array) ? ['value' => $array] : $array;
     }
 
     /**

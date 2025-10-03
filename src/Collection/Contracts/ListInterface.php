@@ -8,6 +8,7 @@ use Traversable;
 
 /**
  * @template T
+ * @extends IteratorAggregate<int, T>
  */
 interface ListInterface extends Countable, IteratorAggregate
 {
@@ -16,8 +17,8 @@ interface ListInterface extends Countable, IteratorAggregate
 
     public function isEmpty(): bool;
 
-    /** @return mixed<T> */
-    public function get(int $index): mixed; // throws OutOfBoundsException
+    /** @return T */
+    public function itemAt(int $index): mixed; // throws OutOfBoundsException
 
     /** @return ?T */
     public function getOrNull(int $index): mixed;
@@ -37,10 +38,19 @@ interface ListInterface extends Countable, IteratorAggregate
     /** @param callable(T):bool $predicate */
     public function filter(callable $predicate): static;
 
-    /** @template U @param callable(T):U $mapper @return ListInterface */
+    /**
+     * @template U
+     * @param callable(T):U $mapper
+     * @return ListInterface<U>
+     */
     public function map(callable $mapper): ListInterface;
 
-    /** @template U @param callable(U,T):U $reducer @param U $initial @return U */
+    /**
+     * @template U
+     * @param callable(U,T):U $reducer
+     * @param U $initial
+     * @return U
+     */
     public function reduce(callable $reducer, mixed $initial): mixed;
 
     public function concat(ListInterface $other): static;
@@ -51,5 +61,6 @@ interface ListInterface extends Countable, IteratorAggregate
     public function toArray(): array;
 
     /** @return Traversable<int,T> */
+    #[\Override]
     public function getIterator(): Traversable;
 }

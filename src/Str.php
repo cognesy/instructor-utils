@@ -15,19 +15,19 @@ class Str
      * Splits a string into an array by a delimiter.
      *
      * @param string $input The input string.
-     * @param string $delimiter The delimiter.
+     * @param non-empty-string $delimiter The delimiter.
      * @return array The array of strings.
      */
     static public function split(string $input, string $delimiter = ' ') : array {
+        assert($delimiter !== '', 'Delimiter must not be empty');
         return explode($delimiter, $input);
     }
 
     /**
-     * Joins an array of strings into a single string.
+     * Converts a string to PascalCase.
      *
-     * @param array $input The array of strings.
-     * @param string $glue The glue.
-     * @return string The joined string.
+     * @param string $input The input string.
+     * @return string The PascalCase string.
      */
     static public function pascal(string $input) : string {
         // turn any case into pascal case
@@ -96,30 +96,32 @@ class Str
         $pipeline = Pipeline::builder(ErrorStrategy::FailFast)
             ->throughAll(
                 // separate groups of capitalized words
-                fn ($data) => preg_replace('/([A-Z])([a-z])/', ' $1$2', $data),
+                fn (string $data): string => preg_replace('/([A-Z])([a-z])/', ' $1$2', $data) ?? $data,
                 // de-camel
                 //fn ($data) => preg_replace('/([A-Z]{2,})([A-Z])([a-z])/', '$1 $2$3', $data),
                 //fn ($data) => preg_replace('/([a-z])([A-Z])([a-z])/', '$1 $2$3', $data),
                 // separate groups of capitalized words of 2+ characters with spaces
-                fn ($data) => preg_replace('/([A-Z]{2,})/', ' $1 ', $data),
+                fn (string $data): string => preg_replace('/([A-Z]{2,})/', ' $1 ', $data) ?? $data,
                 // de-kebab
-                fn ($data) => str_replace('-', ' ', $data),
+                fn (string $data): string => str_replace('-', ' ', $data),
                 // de-snake
-                fn ($data) => str_replace('_', ' ', $data),
+                fn (string $data): string => str_replace('_', ' ', $data),
                 // remove double spaces
-                fn ($data) => preg_replace('/\s+/', ' ', $data),
+                fn (string $data): string => preg_replace('/\s+/', ' ', $data) ?? $data,
                 // remove leading _
-                fn ($data) => ltrim($data, '_'),
+                fn (string $data): string => ltrim($data, '_'),
                 // remove leading -
-                fn ($data) => ltrim($data, '-'),
+                fn (string $data): string => ltrim($data, '-'),
                 // trim space
-                fn ($data) => trim($data),
+                fn (string $data): string => trim($data),
             )
             ->create();
 
-        return $pipeline
+        $result = $pipeline
             ->executeWith(ProcessingState::with($input))
             ->value();
+
+        return is_string($result) ? $result : $input;
     }
 
     /**
@@ -205,7 +207,7 @@ class Str
      * @param string $nextNeedle The next needle.
      * @return string The extracted substring.
      */
-    public static function between(mixed $text, string $firstNeedle, string $nextNeedle) : string {
+    public static function between(string $text, string $firstNeedle, string $nextNeedle) : string {
         $start = strpos($text, $firstNeedle);
         if ($start === false) {
             return '';
@@ -225,7 +227,7 @@ class Str
      * @param string $needle The needle.
      * @return string The extracted substring.
      */
-    public static function after(mixed $text, string $needle) : string {
+    public static function after(string $text, string $needle) : string {
         $start = strpos($text, $needle);
         if ($start === false) {
             return '';

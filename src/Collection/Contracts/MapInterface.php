@@ -9,12 +9,13 @@ use Traversable;
 /**
  * @template K of array-key
  * @template V
+ * @extends IteratorAggregate<K, V>
  */
 interface MapInterface extends Countable, IteratorAggregate
 {
     public function has(int|string $key): bool;
 
-    /** @return mixed<V> */
+    /** @return V */
     public function get(int|string $key): mixed; // throws OutOfBoundsException
 
     /** @return ?V */
@@ -39,5 +40,6 @@ interface MapInterface extends Countable, IteratorAggregate
     public function toArray(): array;
 
     /** @return Traversable<K,V> */
+    #[\Override]
     public function getIterator(): Traversable;
 }

@@ -46,7 +46,7 @@ final readonly class TagQuery
         return new self($this->tagMap->newInstance($tags));
     }
 
-    /** @param TagInterface $class */
+    /** @param class-string<TagInterface> $class */
     public function ofType(string $class): self {
         $filtered = array_filter(
             $this->tags,
@@ -55,7 +55,7 @@ final readonly class TagQuery
         return new self($this->tagMap->newInstance(array_values($filtered)));
     }
 
-    /** @param TagInterface ...$tagClasses Classes of tags to include */
+    /** @param class-string<TagInterface> ...$tagClasses Classes of tags to include */
     public function only(string ...$tagClasses): self {
         $filtered = array_filter(
             $this->tags,
@@ -69,6 +69,7 @@ final readonly class TagQuery
         return new self($this->tagMap->newInstance($skipped));
     }
 
+    /** @param class-string<TagInterface> $class */
     public function tag(string $class): self {
         if ($this->tagMap->has($class)) {
             return $this;
@@ -76,7 +77,7 @@ final readonly class TagQuery
         return $this->only($class);
     }
 
-    /** @param TagInterface ...$tagClasses Classes of tags to remove */
+    /** @param class-string<TagInterface> ...$tagClasses Classes of tags to remove */
     public function without(string ...$tagClasses): self {
         $filtered = array_filter(
             $this->tags,
@@ -96,6 +97,9 @@ final readonly class TagQuery
         return $this->tags;
     }
 
+    /**
+     * @param callable(TagInterface): bool $predicate
+     */
     public function any(callable $predicate): bool {
         foreach ($this->tags as $tag) {
             if ($predicate($tag)) {
@@ -105,7 +109,7 @@ final readonly class TagQuery
         return false;
     }
 
-    /** @return TagInterface Array of tag class names */
+    /** @return array<class-string<TagInterface>> Array of tag class names */
     public function classes(): array {
         return array_unique(
             array_map(
@@ -119,6 +123,9 @@ final readonly class TagQuery
         return count($this->tags);
     }
 
+    /**
+     * @param callable(TagInterface): bool $predicate
+     */
     public function every(callable $predicate): bool {
         foreach ($this->tags as $tag) {
             if (!$predicate($tag)) {
@@ -132,16 +139,15 @@ final readonly class TagQuery
         return $this->tags[0] ?? null;
     }
 
-    /** @param TagInterface $tag Class of the tag to check */
+    /** @param class-string<TagInterface>|TagInterface $tag Class of the tag to check */
     public function has(string|TagInterface $tag): bool {
-        return match(true) {
-            $tag instanceof TagInterface => in_array(get_class($tag), $this->classes(), true),
-            is_string($tag) => in_array($tag, $this->classes(), true),
-            default => throw new \InvalidArgumentException('Expected TagInterface or class string, got ' . get_debug_type($tag)),
-        };
+        if ($tag instanceof TagInterface) {
+            return in_array(get_class($tag), $this->classes(), true);
+        }
+        return in_array($tag, $this->classes(), true);
     }
 
-    /** @param TagInterface $tags Array of tags to check */
+    /** @param class-string<TagInterface>|TagInterface ...$tags Array of tags to check */
     public function hasAll(string|TagInterface ...$tags) : bool {
         foreach ($tags as $tag) {
             if (!$this->has($tag)) {
@@ -151,7 +157,7 @@ final readonly class TagQuery
         return true;
     }
 
-    /** @param TagInterface $tags Array of tags to check */
+    /** @param class-string<TagInterface>|TagInterface ...$tags Array of tags to check */
     public function hasAny(string|TagInterface ...$tags): bool {
         foreach ($tags as $tag) {
             if ($this->has($tag)) {
@@ -181,6 +187,9 @@ final readonly class TagQuery
         return array_map($transformer, $this->tags);
     }
 
+    /**
+     * @param callable(mixed, TagInterface): mixed $reducer
+     */
     public function reduce(callable $reducer, mixed $initial = null): mixed {
         return array_reduce($this->tags, $reducer, $initial);
     }

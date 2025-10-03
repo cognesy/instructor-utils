@@ -13,11 +13,9 @@ class JsonSchemaType implements JsonSerializable, Stringable
 
     /** @var string[] */
     private array $types;
-    private ?bool $isNullable;
 
-    private function __construct(array $types, ?bool $isNullable = null) {
+    private function __construct(array $types) {
         $this->types = $types;
-        $this->isNullable = $isNullable;
     }
 
     public static function fromJsonData(array $data, ?bool $isNullable = null): self {
@@ -38,17 +36,15 @@ class JsonSchemaType implements JsonSerializable, Stringable
             if ($type === 'null') {
                 continue; // 'null' is a valid type, but we handle it separately
             }
-            if (!in_array($type, self::JSON_TYPES)) {
+            if (!in_array($type, self::JSON_TYPES, true)) {
                 throw new \InvalidArgumentException("Invalid JSON type: $type in: " . json_encode($types));
             }
         }
 
-        return new self(
-            types: $types,
-            isNullable: $isNullable,
-        );
+        return new self(types: $types);
     }
 
+    #[\Override]
     public function jsonSerialize(): mixed {
         if (count($this->types) === 1) {
             return $this->types[0];
@@ -64,9 +60,10 @@ class JsonSchemaType implements JsonSerializable, Stringable
         if (count($this->types) === 1) {
             return $this->types[0];
         }
-        return json_encode($this->types);
+        return json_encode($this->types) ?: '';
     }
 
+    #[\Override]
     public function __toString() {
         return $this->toString();
     }
