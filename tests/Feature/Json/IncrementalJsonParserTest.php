@@ -1,9 +1,9 @@
 <?php declare(strict_types=1);
 
-use Cognesy\Utils\Json\IncrementalCompletingJsonParser;
+use Cognesy\Utils\Json\IncrementalJsonParser;
 
 it('completes a growing object stream into valid json and array snapshots', function () {
-    $parser = new IncrementalCompletingJsonParser();
+    $parser = new IncrementalJsonParser();
 
     $parser->append('{"name":"Jo');
     expect($parser->currentJson())->toBe('{"name":"Jo"}');
@@ -19,7 +19,7 @@ it('completes a growing object stream into valid json and array snapshots', func
 });
 
 it('completes incomplete keys and values without reparsing generic json wrappers', function () {
-    $parser = new IncrementalCompletingJsonParser();
+    $parser = new IncrementalJsonParser();
 
     $parser->append('{"na');
     expect($parser->completionSuffix())->toBe('":null}');
@@ -30,7 +30,7 @@ it('completes incomplete keys and values without reparsing generic json wrappers
 });
 
 it('keeps the last successful array when the stream is currently after a trailing comma', function () {
-    $parser = new IncrementalCompletingJsonParser();
+    $parser = new IncrementalJsonParser();
 
     $parser->append('{"name":"Ann"');
     expect($parser->currentArray())->toBe(['name' => 'Ann']);
@@ -41,7 +41,7 @@ it('keeps the last successful array when the stream is currently after a trailin
 });
 
 it('keeps the last successful array when an array is waiting for the next value', function () {
-    $parser = new IncrementalCompletingJsonParser();
+    $parser = new IncrementalJsonParser();
 
     $parser->append('{"items":[1');
     expect($parser->currentArray())->toBe(['items' => [1]]);
@@ -52,7 +52,7 @@ it('keeps the last successful array when an array is waiting for the next value'
 });
 
 it('supports nested arrays and objects across chunk boundaries', function () {
-    $parser = new IncrementalCompletingJsonParser();
+    $parser = new IncrementalJsonParser();
 
     $parser->append('{"items":[{"name":"A');
     expect($parser->currentArray())->toBe([
@@ -71,7 +71,7 @@ it('supports nested arrays and objects across chunk boundaries', function () {
 });
 
 it('handles dangling escape sequences and unicode escape prefixes inside strings', function () {
-    $parser = new IncrementalCompletingJsonParser();
+    $parser = new IncrementalJsonParser();
 
     $parser->append('{"text":"a\\');
     expect($parser->currentJson())->toBe('{"text":"a\\""}');
@@ -84,7 +84,7 @@ it('handles dangling escape sequences and unicode escape prefixes inside strings
 });
 
 it('resets state fully', function () {
-    $parser = new IncrementalCompletingJsonParser();
+    $parser = new IncrementalJsonParser();
 
     $parser->append('{"name":"Ann"}');
     expect($parser->currentArray())->toBe(['name' => 'Ann']);
@@ -96,7 +96,7 @@ it('resets state fully', function () {
 });
 
 it('does not decode scalar roots into arrays', function () {
-    $parser = new IncrementalCompletingJsonParser();
+    $parser = new IncrementalJsonParser();
 
     $parser->append('"hello');
     expect($parser->currentJson())->toBe('"hello"');

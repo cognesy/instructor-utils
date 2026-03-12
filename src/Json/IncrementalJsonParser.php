@@ -2,7 +2,7 @@
 
 namespace Cognesy\Utils\Json;
 
-final class IncrementalCompletingJsonParser
+final class IncrementalJsonParser
 {
     private string $buffer = '';
     /** @var list<array{type: string, state: string}> */
